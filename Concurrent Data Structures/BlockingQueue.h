@@ -34,7 +34,7 @@ public:
             std::unique_lock<std::mutex> locker(_mu);
             if(_dq.empty())
                 _cn_signal.wait(locker, [this](){ return !_dq.empty();});
-            T val = _dq.pop_front();
+            T val = _dq.front(); _dq.pop_front();
             _cn_signal.notify_one();
             return val;
         }

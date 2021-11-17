@@ -2,6 +2,9 @@
 #include <condition_variable>
 #include <deque>
 #include <climits>
+#include <iostream>
+
+using namespace std;
 
 template<typename T>
 class BlockingQueue {
@@ -24,8 +27,9 @@ public:
             std::unique_lock<std::mutex> locker(_mu);
             if(_dq.size() == capacity)
                 _cn_signal.wait(locker, [this](){return _dq.size() < capacity;});
-            _dq.push_front(value);
+            _dq.push_back(value);
         }
+        cout<<"notifying from push"<<endl;
         _cn_signal.notify_one();
     }
 

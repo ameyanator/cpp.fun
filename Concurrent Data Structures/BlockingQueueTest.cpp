@@ -22,20 +22,25 @@ void push_into_queue() {
     while(true) {
         std::unique_lock<std::mutex> locker(mu);
         cout<<"Pushing into queue "<<++count<<endl;
-        add_to_queue(count);
         locker.unlock();
-        std::this_thread::sleep_for (std::chrono::seconds(1));
+        add_to_queue(count);
+        locker.lock();
+        // cout<<"queue size "<<bq.size()<<endl;
+        locker.unlock();
+        std::this_thread::sleep_for (std::chrono::seconds(2));
     }
 }
 
 void pop_from_queue() {
     // cout<<"pop_from_queue"<<endl;
     while(true) {
-        std::unique_lock<std::mutex> locker(mu);
         std::future<int> fu = std::async(pop_queue);
-        std::cout<<"Got Value from queue "<<fu.get()<<std::endl;
+        int x = fu.get();
+        std::unique_lock<std::mutex> locker(mu);
+        std::cout<<"Got Value from queue "<<x<<std::endl;
+        // cout<<"queue size "<<bq.size()<<endl;
         locker.unlock();
-        std::this_thread::sleep_for (std::chrono::seconds(2));
+        std::this_thread::sleep_for (std::chrono::seconds(1));
     }
 }
 

@@ -36,12 +36,16 @@ public:
         {
             std::unique_lock<std::mutex> locker(_mu);
             if(_mp.find(key) != _mp.end()) {
-
+                std::cout<<"key present"<<std::endl;
+                retval = _mp.erase(key);
             }
             else {
-                
+                std::cout<<"key not present"<<std::endl;
+                retval = 0;
             }
         }
+        _cond.notify_one();
+        return retval;
     }
 
     bool empty() {
@@ -51,5 +55,21 @@ public:
             retval = _mp.empty();
         }
         return retval;
+    }
+
+    T at(Key key) {
+        T retval;
+        {
+            std::unique_lock<std::mutex> locker(_mu);
+            retval = _mp.at(key);
+        }
+        return retval;
+    }
+
+    int size() {
+        {
+            std::lock_guard<std::mutex> locker(_mu);
+            return _mp.size();
+        }
     }
 };

@@ -8,7 +8,9 @@ using namespace std;
 BlockingQueue<int> bq;
 std::mutex mu;
 
-std::mutex mu;
+void add_to_queue(int x) {
+    bq.push(x);
+}
 
 int pop_queue() {
     return bq.pop();

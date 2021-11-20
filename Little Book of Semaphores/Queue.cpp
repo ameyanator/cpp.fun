@@ -17,44 +17,60 @@ or waits, accordingly.
 using namespace std;
 
 queue<int> leaders, followers;
-std::mutex mu;
+std::mutex mu,mu2;
 std::condition_variable cond;
+
+void check_if_possible() {
+    std::unique_lock<std::mutex> locker(mu);
+    cond.wait(locker, [](){return (!leaders.empty() and !followers.empty()) or (leaders.empty() and followers.empty());});
+    if(leaders.empty() and followers.empty())
+        return;
+    cout<<"Leader "<<leaders.front()<<" walks with follower "<<followers.front()<<endl;
+    leaders.pop();
+    followers.pop();
+}
 
 void Leader(int l) {
     std::unique_lock<std::mutex> locker(mu);
     std::cout<<"Leader "<<l<<" arrives "<<std::endl;
     leaders.push(l);
-    cond.notify_all();
-
-    cond.wait(locker, [](){return !leaders.empty() and !followers.empty();});
-    cout<<"Leader "<<leaders.front()<<" walks with follower "<<followers.front()<<endl;
-    leaders.pop();
-    followers.pop();
+    locker.unlock();
+    std::this_thread::sleep_for (std::chrono::seconds(3));
+    check_if_possible();
+    std::this_thread::sleep_for (std::chrono::seconds(2));
+    cond.notify_one();
+    // cout<<"Leader exit"<<endl;
 }
 
 void Follower(int l) {
     std::unique_lock<std::mutex> locker(mu);
     std::cout<<"Follower "<<l<<" arrives "<<std::endl;
     followers.push(l);
-    cond.notify_all();
-
-    cond.wait(locker, [](){return !leaders.empty() and !followers.empty();});
-    cout<<"Leader "<<leaders.front()<<" walks with follower "<<followers.front()<<endl;
-    leaders.pop();
-    followers.pop();
+    locker.unlock();
+    std::this_thread::sleep_for (std::chrono::seconds(2));
+    check_if_possible();
+    std::this_thread::sleep_for (std::chrono::seconds(3));
+    cond.notify_one();
+    // cout<<"Follower exit"<<endl;
 }
 
 int main() {
-    vector<std::thread> threads(20);
-    for(int i = 0; i < 10; i++) {
-        cout<<"index "<<i<<endl;
+    int n = 5;
+    vector<std::thread> threads(2*n);
+    for(int i = 0; i < n; i++) {
+        // cout<<"index "<<i<<" and index "<<n+i<<endl;
         threads[i] = std::move(std::thread(Leader, i));
-        threads[2*i+1] = std::move(std::thread(Follower, 2*i+1));
+        threads[n+i] = std::move(std::thread(Follower, n+i));
     }
-    for(int i = 0; i < 20; i++)
+    for(int i = 0; i < 2*n; i++)
     {
-        cout<<"i "<<i<<endl;
+        // cout<<"i "<<i<<endl;
         threads[i].join();
     }
     return 0;
 }
+
+/*
+0 1 4 3 2
+5 9 8 7 6
+*/

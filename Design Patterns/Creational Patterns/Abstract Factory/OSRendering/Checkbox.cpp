@@ -2,5 +2,7 @@
 #pragma once
 
 class Checkbox {
-    virtual void generate();
+public:
+    virtual void generate() const = 0;
+    virtual ~Checkbox() {}
 };

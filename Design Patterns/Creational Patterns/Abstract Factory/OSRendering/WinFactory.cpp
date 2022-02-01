@@ -1,10 +1,11 @@
 #include "GUIFactory.cpp"
 
 class WinFactory : public GUIFactory {
-    Button* createButton() {
+public:
+    Button* createButton() const override {
         return new WinButton();
     }
-    Checkbox* createCheckbox() {
+    Checkbox* createCheckbox() const override {
         return new WinCheckbox();
     }
 };

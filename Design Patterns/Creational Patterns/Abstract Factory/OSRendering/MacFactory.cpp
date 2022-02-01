@@ -1,11 +1,11 @@
 #include "GUIFactory.cpp"
 
 class MacFactory : public GUIFactory {
-    Button* createButton() {
+    Button* createButton()const override {
         return new MacButton();
     }
 
-    Checkbox* createCheckbox() {
+    Checkbox* createCheckbox()const override {
         return new MacCheckbox();
     }
 };

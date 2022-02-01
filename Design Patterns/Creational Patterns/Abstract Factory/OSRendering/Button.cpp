@@ -3,5 +3,6 @@
 
 class Button {
 public:
-    virtual void paint();
+    virtual ~Button() {}
+    virtual void paint() const = 0;
 };

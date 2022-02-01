@@ -2,7 +2,7 @@
 #pragma once
 
 class WinCheckbox : public Checkbox {
-    void generate() override {
+    void generate() const override {
         std::cout << "Win is Generating " << std::endl;
     }
 };

@@ -7,6 +7,7 @@
 #pragma once
 
 class GUIFactory {
-    Button* createButton() ;
-    Checkbox* createCheckbox();
+public:
+    virtual Button* createButton() const = 0;
+    virtual Checkbox* createCheckbox() const = 0;
 };
